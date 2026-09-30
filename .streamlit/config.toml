@@ -1,0 +1,4 @@
+[server]
+# The source watcher walks every imported module (all of torch/transformers),
+# which roughly triples startup time. Restart the app manually after code edits.
+fileWatcherType = "none"
