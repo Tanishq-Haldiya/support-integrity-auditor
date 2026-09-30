@@ -1,0 +1,49 @@
+Ticket_ID,Ticket_Subject,Ticket_Description,Priority_Level,expected_severity
+CH-001,Security,"Hello, somebody changed my password and email overnight, I believe my account was hacked.",Low,Critical
+CH-002,Card,"There are three purchases on my statement from your store that I never made.",Medium,Critical
+CH-003,Email,"I got a message pretending to be your billing team asking me to confirm my card number.",High,Critical
+CH-004,Login,"Your system says an unknown device in Brazil signed into my profile yesterday.",Critical,Critical
+CH-005,Card,"My credit card was stolen last week, please make sure nobody can use it on my account.",Low,Critical
+CH-006,Account,"Please freeze everything, there are fraudulent orders under my name.",Medium,Critical
+CH-007,Alert,"I keep receiving sign-in alert emails even though I have not logged in for days.",High,Critical
+CH-008,Security,"I think someone else is using my account, the order history shows things that were not me.",Low,Critical
+CH-009,App,"The mobile app crashed three times today while I was exporting a report.",Low,High
+CH-010,API,"All requests to your API return a 503 error since this morning.",Medium,High
+CH-011,Dashboard,"The analytics page shows a blank screen for everyone on our team.",Low,High
+CH-012,Sync,"Files I uploaded on Monday never synced to the cloud and are missing on my laptop.",Medium,High
+CH-013,Login,"I can't sign in at all, the reset link did not help either.",High,High
+CH-014,2FA,"My phone was replaced and now I am unable to complete two-factor verification.",Low,High
+CH-015,Outage,"Is there an outage? The website is down for us in Europe.",Critical,High
+CH-016,Freeze,"Whenever I open the editor the whole screen freezes and I have to restart.",Medium,High
+CH-017,Data,"After the update we lost all the data in our shared workspace.",Low,High
+CH-018,Reports,"The reports module is not working, clicking export does nothing.",High,High
+CH-019,Billing,"I was billed twice for my March subscription.",Low,Medium
+CH-020,Refund,"Still waiting on the refund you promised two weeks ago.",High,Medium
+CH-021,Payment,"The checkout keeps rejecting my new debit card, the payment failed four times.",Medium,Medium
+CH-022,Subscription,"My plan auto-renewed even though I turned renewal off.",Critical,Medium
+CH-023,Email,"The verification email never arrives in my inbox or spam folder.",Low,Medium
+CH-024,Invoice,"This month's bill is higher than the price on your website.",High,Medium
+CH-025,Settings,"My notification settings are not saving when I press apply.",Medium,Medium
+CH-026,Charge,"You charged me the wrong amount for the annual plan.",Low,Medium
+CH-027,Hours,"What time does your support team open on Saturdays?",High,Low
+CH-028,Discount,"Do you have a student discount?",Critical,Low
+CH-029,Install,"How can I get the new version installed on my Mac?",High,Low
+CH-030,Receipt,"Could you email me a receipt for my last order?",Medium,Low
+CH-031,Email change,"I'd like to update the email address on file to my work one.",High,Low
+CH-032,Roadmap,"Any plans to add dark mode later this year?",Low,Low
+CH-033,Plans,"How do I move my team to the business plan?",Critical,Low
+CH-034,Demo,"Can we book a short product walkthrough for our new hires?",High,Low
+CH-035,Office,"Where is your European office?",Low,Low
+CH-036,Account,"Please close my account, I no longer need it.",Medium,Low
+CH-037,Pricing,"What are the differences between the Pro and Team tiers?",High,Low
+CH-038,Feature,"Would love an integration with Trello if possible.",Critical,Low
+CH-039,Urgent,"URGENT: we need the invoice for last quarter today for our auditors.",Low,Medium
+CH-040,Help,"No rush at all, but how do I rename a project?",Low,Low
+CH-041,Down,"Our checkout page is down and customers cannot pay.",Low,High
+CH-042,Manager,"This is unacceptable, my refund still hasn't come through and I want to speak to a manager.",Low,High
+CH-043,Access,"Unable to access my dashboard after the password change.",Medium,High
+CH-044,Phishing,"Is this link someone sent me in your name a phishing attempt?",Medium,Critical
+CH-045,Sync,"Contacts are not syncing between the web and mobile apps.",Low,High
+CH-046,Questions,"Hi Support, where can I download last year's statements?",High,Low
+CH-047,Charge,"Hi Support, I see a charge I did not authorize on my card.",Low,Critical
+CH-048,Loading,"Hi Support, the inbox won't load, it's been like this for hours.",Medium,High

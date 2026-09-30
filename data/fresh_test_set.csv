@@ -1,0 +1,81 @@
+Ticket_ID,Ticket_Subject,Ticket_Description,Priority_Level,expected_severity
+HV-001,Account,"My password was changed this morning and I did not do it. I can no longer get in.",Low,Critical
+HV-002,Codes,"I'm getting 2FA codes by text that I never requested, several times an hour.",Medium,Critical
+HV-003,Orders,"there are 4 orders on my account shipping to an address in another state, none of them are mine",Low,Critical
+HV-004,Billing,"A payment of $870 went out from our company card to your service and nobody here authorised it.",Medium,Critical
+HV-005,Email,"Someone emailed our finance team from a support-looking address asking them to 'verify' the admin login. Is that you?",High,Critical
+HV-006,Security,"An API key for our org was posted publicly on a forum and we can see calls from IPs we don't own.",Critical,Critical
+HV-007,Access,"There is an admin user on our workspace called 'helpdesk2' that none of us created.",Low,Critical
+HV-008,Card,"Hi, I lost my wallet and my card is saved on your site. Please block it before anyone orders with it.",Medium,Critical
+HV-009,Login,"Got a notification that my account was accessed from Singapore. I live in Canada and have never been there.",High,Critical
+HV-010,Recovery,"My recovery email was switched to an address I don't recognise and I'm now locked out.",Medium,Critical
+HV-011,Transfer,"Money was withdrawn from my stored balance twice overnight and I didn't make either withdrawal.",Low,Critical
+HV-012,Scam,"A caller claiming to be from your fraud team asked me to read out my one-time code. I think I gave it to them.",Medium,Critical
+HV-013,Site,"The whole site returns a blank white page for every one of our users since 9am.",Low,High
+HV-014,Sync,"Nothing we enter on mobile shows up on desktop anymore, we've lost two days of field notes.",Medium,High
+HV-015,API,"your api is timing out on every request, our integration is completely stopped",Low,High
+HV-016,Checkout,"Customers can't complete checkout, the pay button just spins forever.",Medium,High
+HV-017,App,"App closes itself immediately after the splash screen on Android 14. Can't use it at all.",Low,High
+HV-018,Login,"Nobody in our office can sign in since the update, it says invalid session.",Medium,High
+HV-019,Upload,"Every file upload fails with 'something went wrong' and we have a deadline today.",Low,High
+HV-020,Reports,"Scheduled reports stopped sending three days ago and our clients are asking where they are.",Medium,High
+HV-021,Data,"Half of our customer records disappeared after the import this morning.",Low,High
+HV-022,Webhooks,"Webhooks have not fired since yesterday so no orders are reaching our warehouse.",Medium,High
+HV-023,Editor,"the editor hangs whenever I paste an image and I lose everything I typed",Low,High
+HV-024,Access,"I'm stuck on the 2-step screen because my authenticator app was wiped when I reset my phone.",Medium,High
+HV-025,Server,"Getting 502 Bad Gateway on the dashboard and the mobile app for the last hour.",Critical,High
+HV-026,Search,"Search returns zero results for everything, even for items I can see in the list.",Medium,High
+HV-027,Billing,"I got billed for two seats but we only have one user.",Low,Medium
+HV-028,Refund,"You said the refund would be back on my card in 3-5 days. It's been two weeks.",High,Medium
+HV-029,Cancel,"I cancelled in March but was still charged in April.",Low,Medium
+HV-030,Card,"My new card gets declined at checkout every time even though it works everywhere else.",High,Medium
+HV-031,Invoice,"The invoice total doesn't include the discount we were promised by your sales rep.",Critical,Medium
+HV-032,Notifications,"Push notifications stopped arriving on my phone, email ones still work.",Low,Medium
+HV-033,Export,"The CSV export cuts off after 1000 rows so I only get part of my data.",High,Medium
+HV-034,Plan,"I downgraded to the free plan but I'm still being charged the Pro price.",Low,Medium
+HV-035,Settings,"Dark mode resets to light mode every time I log in.",High,Medium
+HV-036,Email,"The receipt emails go to my old address even though I updated it last week.",Medium,Medium
+HV-037,Tax,"VAT was added to my invoice although we entered our VAT number.",Critical,Medium
+HV-038,Calendar,"Calendar sync with Outlook is about an hour behind, events show up late.",Low,Medium
+HV-039,Images,"Profile photos are showing up blurry after the last update.",High,Medium
+HV-040,Trial,"My trial converted to paid a day early.",Low,Medium
+HV-041,Export,"How do I export my transaction history as a CSV?",High,Low
+HV-042,Invoice,"Could you resend the invoice for transaction 44821, I deleted the email by accident.",Critical,Low
+HV-043,Receipt,"Can I get a receipt that shows the transaction in euros for my expense report?",High,Low
+HV-044,Account,"How do I add a second admin to our workspace?",Critical,Low
+HV-045,API,"Is there a rate limit on the public API and where is it documented?",High,Low
+HV-046,Feature,"It would be great if we could tag tickets with colours.",Critical,Low
+HV-047,Security,"Do you support SAML single sign-on on the Team plan?",High,Low
+HV-048,Pricing,"what's the price difference between monthly and yearly billing",Critical,Low
+HV-049,Device,"How do I remove an old laptop from my list of trusted devices? I sold it last year.",High,Low
+HV-050,Password,"How often should I change my password, is there a policy I can set for my team?",Critical,Low
+HV-051,Data,"Where are your servers located, we need it for our GDPR record.",High,Low
+HV-052,Language,"Can the interface be switched to Spanish?",Medium,Low
+HV-053,Onboarding,"We have 12 new starters next week, is there a training video we can share?",High,Low
+HV-054,Contract,"Please send me a copy of our current contract for renewal planning.",Critical,Low
+HV-055,Logo,"How do I change the logo shown on our customer portal?",High,Low
+HV-056,Hours,"Are you open on public holidays?",Critical,Low
+HV-057,Refund policy,"What's your refund policy for annual plans if we cancel mid-year?",High,Low
+HV-058,Crash docs,"Where can I find the crash reporting settings for the SDK?",Critical,Low
+HV-059,Mobile,"Is there an iPad version of the app?",High,Low
+HV-060,Integration,"Does your product integrate with Slack?",Critical,Low
+HV-061,Mixed,"Two things: I'd like a copy of my last invoice, and also somebody logged into my account from a device I don't own.",Low,Critical
+HV-062,Mixed,"Quick question about pricing tiers, but first - the app has been completely down for us since lunch.",Low,High
+HV-063,Urgent,"URGENT!!! please tell me how to change my profile picture",Low,Medium
+HV-064,Calm,"Not urgent, but I think someone may have used my card on your site last night, there's a charge I don't recognise.",Low,Critical
+HV-065,Polite,"Sorry to bother you, whenever you have a moment - our payments page has been returning errors to every customer since this morning.",Low,High
+HV-066,Typo,"cant log in at all, tried resetting passwrod 3 times, reset link never comes",Low,High
+HV-067,Typo,"ur app keeps crashign when i open messages",Low,High
+HV-068,Typo,"i was chraged twice this month pls fix",Low,Medium
+HV-069,Long,"Hello team, we've been customers for three years and are generally very happy. Since Tuesday, however, our shared inbox has stopped receiving any new messages, so our support staff cannot see customer emails at all. We have checked our own mail settings. Can you look into this?",Low,High
+HV-070,Long,"Hi there, hope you're well. I'm putting together our budget for next year and wanted to understand how volume discounts work if we go from 50 to 120 seats. No rush on this.",Critical,Low
+HV-071,Status,"Is there a status page I can check when things are slow?",High,Low
+HV-072,Slow,"Pages take about 10 seconds to load today, it was fine yesterday.",Low,Medium
+HV-073,Duplicate,"The same notification shows up three times in my feed.",High,Medium
+HV-074,Access,"My colleague left the company, how do I remove their access?",High,Low
+HV-075,Offboarding,"An ex-employee still has access to our workspace and just downloaded our client list.",Low,Critical
+HV-076,Backup,"Can we get a full backup of our data each month?",Critical,Low
+HV-077,Lost data,"I deleted a project by mistake yesterday, it had all our contracts in it. Can it be restored?",Low,High
+HV-078,Timezone,"Timestamps on the reports are shown in UTC instead of our local time.",High,Medium
+HV-079,Invite,"Invites to new teammates never arrive in their inbox.",Low,Medium
+HV-080,Question,"Why does my dashboard say I have 3 unread alerts when there are none?",Critical,Medium
