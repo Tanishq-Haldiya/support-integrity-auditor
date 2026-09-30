@@ -1,0 +1,210 @@
+"""Evaluate every available backend and write reports/evaluation.md.
+
+Views, most trustworthy first:
+  1. Fresh test set (data/fresh_test_set.csv): 80 tickets never used for development,
+     verified against the SHA-256 in data/fresh_test_set.sha256.
+  2. Template cross-validation: every one of the 30 templates held out once.
+  3. Challenge set (data/challenge_set.csv): written alongside the rubric, so optimistic.
+  4. Calibration, signal diagnostics and reviewer feedback.
+"""
+
+import glob
+import hashlib
+import json
+import os
+import re
+import sys
+
+import numpy as np
+import pandas as pd
+from sklearn.metrics import accuracy_score, f1_score
+
+from sia import LEVEL_OF, PRIORITY_LEVELS, URGENT_THRESHOLD, feedback
+from sia.audit import classify
+from sia.calibration import expected_calibration_error, load_config, urgent_threshold
+from sia.labeling import (KEYWORD_BASELINE_TERMS, generate_labels, keyword_filler_hit_rate, keyword_fusion_labels,
+                          mismatch_type, resolution_signal_report)
+from sia.models import available_backends, hybrid_base, load_model
+
+HOLDOUT = os.path.join("data", "fresh_test_set.csv")
+CHALLENGE = os.path.join("data", "challenge_set.csv")
+HOLDOUT_HASH = os.path.join("data", "fresh_test_set.sha256")
+REPORTS_DIR = "reports"
+
+
+def keyword_baseline_urgent(texts):
+    """Baseline: a ticket is urgent if it contains any urgent-sounding keyword."""
+    score = [sum(bool(re.search(r"\b" + w + r"\w*\b", t.lower())) for w in KEYWORD_BASELINE_TERMS) for t in texts]
+    return np.array(score) > 0
+
+
+def score_set(path, threshold):
+    """Metrics for every backend on one hand-labelled set."""
+    df = pd.read_csv(path)
+    y = df["expected_severity"].map(LEVEL_OF).to_numpy()
+    assigned = df["Priority_Level"].map(LEVEL_OF).to_numpy()
+    y_mism = np.array([mismatch_type(a, t) for a, t in zip(assigned, y)])
+    rows, misses = [], {}
+
+    urgent = keyword_baseline_urgent(df["Ticket_Description"])
+    mism = [classify(a, float(u)) for a, u in zip(assigned, urgent)]
+    rows.append({"backend": "keyword baseline", "severity_acc": None,
+                 "urgent_acc": accuracy_score(y >= URGENT_THRESHOLD, urgent),
+                 "mismatch_f1": f1_score(y_mism, mism, average="macro"),
+                 "hidden_crisis_recall": _recall(y_mism, mism, "Hidden Crisis"), "ece": None})
+
+    for backend in available_backends():
+        model = load_model(backend)
+        proba = model.predict_proba(df["Ticket_Description"].tolist(), df["Ticket_Subject"].tolist())
+        pred = proba.argmax(axis=1)
+        p_urgent = proba[:, URGENT_THRESHOLD:].sum(axis=1)
+        mism = [classify(a, p, threshold) for a, p in zip(assigned, p_urgent)]
+        label = f"hybrid ({hybrid_base()})" if backend == "hybrid" else backend
+        rows.append({"backend": label,
+                     "severity_acc": accuracy_score(y, pred),
+                     "urgent_acc": accuracy_score(y >= URGENT_THRESHOLD, p_urgent >= threshold),
+                     "mismatch_f1": f1_score(y_mism, mism, average="macro"),
+                     "hidden_crisis_recall": _recall(y_mism, mism, "Hidden Crisis"),
+                     "ece": expected_calibration_error(proba, y)})
+        wrong = df.loc[pred != y, ["Ticket_ID", "Ticket_Description", "expected_severity"]].copy()
+        wrong["predicted"] = [PRIORITY_LEVELS[p] for p in pred[pred != y]]
+        misses[label] = wrong
+    return pd.DataFrame(rows), misses, len(df)
+
+
+def _recall(y_true, y_pred, cls):
+    m = np.asarray(y_true) == cls
+    return float(np.mean(np.asarray(y_pred)[m] == cls)) if m.any() else None
+
+
+def fmt(x, pct=True):
+    if x is None or (isinstance(x, float) and np.isnan(x)):
+        return "n/a"
+    return f"{x:.1%}" if pct else f"{x:.3f}"
+
+
+def results_table(table):
+    lines = ["| Backend | Severity acc | Urgent vs not acc | Mismatch macro-F1 | Hidden Crisis recall | ECE (lower is better) |",
+             "|---|---|---|---|---|---|"]
+    for r in table.itertuples():
+        lines.append(f"| {r.backend} | {fmt(r.severity_acc)} | {fmt(r.urgent_acc)} | {fmt(r.mismatch_f1, False)} | "
+                     f"{fmt(r.hidden_crisis_recall)} | {fmt(r.ece, False)} |")
+    return lines
+
+
+def misses_block(misses):
+    lines = []
+    for backend, wrong in misses.items():
+        if len(wrong):
+            lines += [f"<details><summary>{backend}: {len(wrong)} severity errors</summary>", "",
+                      "| Ticket | Text | Expected | Predicted |", "|---|---|---|---|"]
+            lines += [f"| {w.Ticket_ID} | {w.Ticket_Description} | {w.expected_severity} | {w.predicted} |"
+                      for w in wrong.itertuples()]
+            lines += ["", "</details>", ""]
+    return lines
+
+
+def main():
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # Windows consoles default to cp1252
+    os.makedirs(REPORTS_DIR, exist_ok=True)
+    threshold = urgent_threshold()
+    cfg = load_config()
+    lines = ["# SIA evaluation report", "",
+             "_Generated by `python evaluate.py`. Numbers are computed, not hand-entered._", "",
+             f"Decision rule: a ticket counts as urgent when P(High or Critical) ≥ **{threshold:.2f}**"
+             + (f" (cost ratio {cfg['cost_ratio']:g}: a missed urgent ticket is treated as "
+                f"{cfg['cost_ratio']:g}× worse than a wrong urgent flag)." if "cost_ratio" in cfg else "."), ""]
+
+    # 1. Fresh sealed test set
+    if os.path.exists(HOLDOUT):
+        sha = hashlib.sha256(open(HOLDOUT, "rb").read()).hexdigest()
+        table, misses, n = score_set(HOLDOUT, threshold)
+        recorded = open(HOLDOUT_HASH).read().split()[0] if os.path.exists(HOLDOUT_HASH) else None
+        check = ("matches the recorded hash" if recorded == sha
+                 else "**does not match the recorded hash: the test set has been modified**")
+        lines += [f"## 1. Fresh test set ({n} tickets, never used for development)", "",
+                  f"SHA-256 `{sha[:16]}…` {check}. No rule, paraphrase or setting was tuned on these tickets; "
+                  "paraphrases too close to any of them are filtered out before training (`sia/augment.py`).", ""]
+        lines += results_table(table) + [""]
+        lines += misses_block(misses)
+
+    # 2. Template cross-validation
+    cv_files = sorted(glob.glob(os.path.join(REPORTS_DIR, "train_metrics_*_template-cv*.json")))
+    if cv_files:
+        lines += ["## 2. Template cross-validation (every template held out once)", "",
+                  "Each ticket is scored by a model trained without its template: the dataset's own measure of "
+                  "generalisation to unseen wording. Labels are the rubric pseudo-labels.", "",
+                  "| Backend | Paraphrase augmentation | Severity acc | Severity macro-F1 | Urgent vs not acc | "
+                  "Mismatch macro-F1 | Recall L/M/H/C |", "|---|---|---|---|---|---|---|"]
+        for path in cv_files:
+            m = json.load(open(path))
+            rec = "/".join(f"{m['per_level_recall'][k]:.2f}" for k in PRIORITY_LEVELS)
+            aug = m.get("config", {}).get("augment", 0)
+            lines.append(f"| {m['backend']} | {'yes (p=' + format(aug, 'g') + ')' if aug else 'no'} | "
+                         f"{m['severity_accuracy']:.1%} | {m['severity_macro_f1']:.3f} | "
+                         f"{m['urgent_vs_not_accuracy']:.1%} | {m['mismatch_macro_f1']:.3f} | {rec} |")
+        lines.append("")
+
+    # 3. First challenge set
+    if os.path.exists(CHALLENGE):
+        table, _, n = score_set(CHALLENGE, threshold)
+        lines += [f"## 3. Challenge set ({n} tickets, written alongside the rubric)", "",
+                  "Written while the rubric was being developed, and seen before the hybrid rule and the "
+                  "paraphrases were written, so these numbers are optimistic. Section 1 is the trustworthy one.", ""]
+        lines += results_table(table) + [""]
+
+    # 4. Calibration
+    if cfg.get("temperature"):
+        lines += ["## 4. Confidence calibration", "",
+                  "Temperature fitted on out-of-fold template-CV predictions (tickets whose template the model "
+                  "never saw). ECE = average gap between stated P(urgent) and the observed urgent rate.", "",
+                  "| Backend | Temperature | Urgent log loss before → after | ECE before → after |", "|---|---|---|---|"]
+        for b, t in cfg["temperature"].items():
+            d = cfg["diagnostics"][b]
+            lines.append(f"| {b} | {t:.2f} | {d['nll_before']:.3f} → {d['nll_after']:.3f} | "
+                         f"{d['ece_before']:.3f} → {d['ece_after']:.3f} |")
+        lines.append("")
+
+    # 5. Signal diagnostics
+    if os.path.exists("data/customer_support_tickets.csv"):
+        df = pd.read_csv("data/customer_support_tickets.csv")
+        labeled = generate_labels(df)
+        diag = resolution_signal_report(labeled)
+        filler = keyword_filler_hit_rate(df)
+        agree = (keyword_fusion_labels(df) == (labeled["severity_level"] >= URGENT_THRESHOLD)).mean()
+        purity = labeled.groupby("template")["severity_level"].nunique()
+        lines += ["## 5. Signal diagnostics (why labels come from the rubric)", "",
+                  f"- Resolution time vs assigned priority (pooled Spearman): **{diag['spearman_resolution_vs_assigned_priority']}**. "
+                  "Fast resolution follows the *assigned* label.",
+                  "- Within a single assigned priority, resolution time barely differs by inferred severity:", "",
+                  "| Assigned | n | Median hours by inferred severity | Spearman ρ | Kruskal p | η² |", "|---|---|---|---|---|---|"]
+        for r in diag["within_priority"]:
+            if "spearman_rho" in r:
+                med = ", ".join(f"{k}: {v:g}" for k, v in r["median_hours_by_inferred_level"].items())
+                lines.append(f"| {r['assigned_priority']} | {r['n']} | {med} | {r['spearman_rho']} | {r['kruskal_p']} | {r['eta_squared']} |")
+        lines += ["",
+                  f"- Keyword-baseline hits that came from random filler text: **{filler['filler_share']:.1%}** "
+                  f"({filler['hits_in_filler_text']} of {filler['keyword_hits']}).",
+                  f"- Rubric labels are stable: {int((purity == 1).sum())}/{len(purity)} templates get one severity regardless of filler.",
+                  f"- Keyword + resolution-time baseline vs rubric agreement on 'urgent': {agree:.1%}.",
+                  "", "Pseudo-label distribution:", "", "| Mismatch type | Tickets |", "|---|---|"]
+        lines += [f"| {k} | {v} |" for k, v in labeled["mismatch_type"].value_counts().items()]
+        lines.append("")
+
+    # 6. Reviewer feedback
+    stats = feedback.agreement(feedback.load())
+    if stats:
+        lines += ["## 6. Reviewer feedback", "",
+                  f"{stats['reviews']} tickets reviewed; reviewers upheld {stats['flags_upheld']} of "
+                  f"{stats['flags_reviewed']} flags (precision {fmt(stats['flag_precision'])}); exact severity "
+                  f"agreement {fmt(stats['exact_severity_agreement'])}.", ""]
+
+    out = os.path.join(REPORTS_DIR, "evaluation.md")
+    with open(out, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    print("\n".join(lines))
+    print(f"\nWrote {out}")
+
+
+if __name__ == "__main__":
+    main()

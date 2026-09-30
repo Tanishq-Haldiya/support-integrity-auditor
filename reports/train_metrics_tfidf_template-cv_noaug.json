@@ -1,0 +1,80 @@
+{
+  "n_val": 3000,
+  "severity_accuracy": 0.3203,
+  "severity_macro_f1": 0.205,
+  "urgent_vs_not_accuracy": 0.5777,
+  "mismatch_accuracy": 0.5777,
+  "mismatch_macro_f1": 0.3938,
+  "per_level_recall": {
+    "Low": 0.7091,
+    "Medium": 0.1401,
+    "High": 0.0081,
+    "Critical": 0.1242
+  },
+  "confusion_matrix": [
+    [
+      819,
+      123,
+      112,
+      101
+    ],
+    [
+      617,
+      116,
+      94,
+      1
+    ],
+    [
+      580,
+      277,
+      7,
+      0
+    ],
+    [
+      131,
+      3,
+      0,
+      19
+    ]
+  ],
+  "per_template_accuracy": {
+    "can you send me the invoice for transaction #99283?": 1.0,
+    "do you offer a discount for non-profits?": 1.0,
+    "how do i install the latest patch on windows 11?": 1.0,
+    "how do i upgrade to the enterprise plan?": 1.0,
+    "how does the team pricing tier work?": 1.0,
+    "i am not receiving the password reset email.": 0.0,
+    "i cannot log into my account even after resetting the password.": 0.011,
+    "i have been trying to update my payment method but it keeps failing.": 0.214,
+    "i lost my phone and cannot pass the 2fa check.": 0.0,
+    "i noticed a double charge on my statement for last month.": 0.0,
+    "i received a login alert from a device in russia, which wasn't me.": 1.0,
+    "i received a suspicious email claiming to be support.": 0.0,
+    "i requested a refund 5 days ago, where is it?": 0.0,
+    "i think my account has been compromised.": 0.0,
+    "i want to permanently delete my account and data.": 0.0,
+    "i would like to request a demo for my team.": 0.977,
+    "is there a roadmap for new features this year?": 0.945,
+    "lock my account immediately, i see transactions i didn't make.": 0.0,
+    "my data hasn't synced to the cloud for 24 hours.": 0.0,
+    "my profile picture is not updating.": 0.708,
+    "my subscription renewed automatically, but i wanted to cancel.": 0.019,
+    "please help me change the email address associated with my account.": 0.074,
+    "someone used my card to make a purchase on your site.": 0.0,
+    "the application crashes every time i open the settings tab.": 0.036,
+    "the dashboard is not loading any data, just a spinning wheel.": 0.0,
+    "we are receiving a 500 internal server error on the api endpoint.": 0.0,
+    "what are your support operating hours?": 0.77,
+    "where is your headquarters located?": 0.0,
+    "why is my bill higher than the agreed amount?": 0.0,
+    "why is there a new device added to my trusted list?": 0.0
+  },
+  "backend": "tfidf",
+  "split": "template-cv",
+  "tag": "noaug",
+  "config": {
+    "augment": 0.0
+  },
+  "train_seconds": 32.8,
+  "val_inference_tickets_per_sec": 3769.8
+}
