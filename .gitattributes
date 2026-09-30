@@ -1,0 +1,4 @@
+# Keep data byte-identical on every OS: the sealed test set is verified by SHA-256,
+# which a CRLF conversion on checkout would change.
+data/** text eol=lf
+reports/*.json text eol=lf

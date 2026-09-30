@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Project brief and write-ups (kept locally, not in the repository)
+*.pdf
+docs/
+
+# Trained models (reproduce with train.py, calibrate.py, export_onnx.py)
+models/
+
+# Generated data and outputs
+data/pseudo_labeled_tickets.csv
+data/feedback.csv
+predictions_output.csv
+
+# Experiment by-products: only the report and the metrics it cites are kept
+reports/*.npz
+reports/train_metrics_*_random*.json
+
+# Local tooling
+.claude/
