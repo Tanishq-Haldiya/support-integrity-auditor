@@ -1,0 +1,18 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      # The unit tests use the rule-based backend and fake models, so torch/transformers are not needed here.
+      - run: pip install pandas numpy scipy scikit-learn joblib fastapi httpx pytest
+      - run: python -m pytest -q
